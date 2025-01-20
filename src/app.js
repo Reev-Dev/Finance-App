@@ -12,7 +12,11 @@ const app = express();
 // Middleware untuk parsing JSON pada request body
 app.use(express.json());
 
+// Import Rute API
+const userRoutes = require('./routes/userRoutes');
 
+// Gunakan Rute API
+app.use('/api/users', userRoutes);
 
 // Port aplikasi
 const PORT = process.env.PORT || 5000;
