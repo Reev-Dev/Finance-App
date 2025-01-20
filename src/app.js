@@ -12,6 +12,8 @@ const app = express();
 // Middleware untuk parsing JSON pada request body
 app.use(express.json());
 
+
+
 // Port aplikasi
 const PORT = process.env.PORT || 5000;
 
