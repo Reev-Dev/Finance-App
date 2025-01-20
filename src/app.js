@@ -14,9 +14,11 @@ app.use(express.json());
 
 // Import Rute API
 const userRoutes = require('./routes/userRoutes');
+const financeRoutes = require('./routes/financeRoutes');
 
 // Gunakan Rute API
 app.use('/api/users', userRoutes);
+app.use('/api/finances', financeRoutes);
 
 // Port aplikasi
 const PORT = process.env.PORT || 5000;
