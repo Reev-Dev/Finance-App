@@ -62,6 +62,36 @@ const updateFinance = async (req, res) => {
     }
 }
 
+// Controller untuk mendapatkan laporan finance user
+const getFinanceReport = async (req, res) => {
+    const finances = await Finance.find({ user: req.user.id });
+    
+    try {
+        // filter dan hitung total incomes
+        const totalIncomes = finances
+            .filter(finance => finance.type === 'income')
+            .reduce((total, finance) => total + finance.amount, 0);
+
+        // filter dan hitung total expenses
+        const totalExpenses = finances
+            .filter(finance => finance.type === 'expense')
+            .reduce((total, finance) => total + finance.amount, 0);
+
+        // hitung balance
+        const balance = totalIncomes - totalExpenses;
+
+        // kirimkan laporan sebagai response
+        res.status(200).json({
+            totalIncomes,
+            totalExpenses,
+            balance
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Server trouble' });
+    }
+};
+
+
 // Controller untuk menghapus data finance
 const deleteFinance = async (req, res) => {
     const { id } = req.params;
@@ -83,4 +113,4 @@ const deleteFinance = async (req, res) => {
     }
 };
 
-module.exports = { getFinances, createFinance, updateFinance, deleteFinance };
+module.exports = { getFinances, createFinance, updateFinance, getFinanceReport, deleteFinance };
