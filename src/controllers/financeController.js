@@ -65,7 +65,7 @@ const updateFinance = async (req, res) => {
 // Controller untuk mendapatkan laporan finance user
 const getFinanceReport = async (req, res) => {
     const finances = await Finance.find({ user: req.user.id });
-    
+
     try {
         // filter dan hitung total incomes
         const totalIncomes = finances
@@ -91,6 +91,16 @@ const getFinanceReport = async (req, res) => {
     }
 };
 
+// Controller untuk mendapatkan data berdasarkan tahun
+const getFinanceByYear = async (req, res) => {
+    const { year } = req.params;
+    try {
+        const finances = await Finance.find({ user: req.user.id, createdAt: { $gte: new Date(`${year}-01-01`), $lte: new Date(`${year}-12-31`) } });
+        res.status(200).json(finances);
+    } catch (err) {
+        res.status(500).json({ message: 'Server trouble' });
+    }
+};
 
 // Controller untuk menghapus data finance
 const deleteFinance = async (req, res) => {
@@ -113,4 +123,4 @@ const deleteFinance = async (req, res) => {
     }
 };
 
-module.exports = { getFinances, createFinance, updateFinance, getFinanceReport, deleteFinance };
+module.exports = { getFinances, createFinance, updateFinance, getFinanceReport, getFinanceByYear, deleteFinance };
