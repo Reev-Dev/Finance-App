@@ -7,6 +7,7 @@ const {
     createFinance,
     updateFinance,
     getCategoryStats,
+    getMonthlyStats,
     getFinanceReport,
     filterFinance,
     deleteFinance,
@@ -23,5 +24,8 @@ router.get('/filter', protect, filterFinance);
 
 // Route untuk mendapatkan statistik berdasarkan kategori
 router.get('/category-stats', protect, getCategoryStats);
+
+// Route untuk mendapatkan statistik bulanan
+router.get('/monthly-stats', protect, getMonthlyStats);
 
 module.exports = router;
