@@ -21,10 +21,15 @@ const financeSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Tipe diperlukan'],
             enum: ['income', 'expense'],
-        }
+        },
+        category: {
+            type: String,
+            required: true,
+            enum: ['salary', 'education', 'health', 'food', 'transportation', 'entertainment', 'utilities', 'others'],
+        },
     }, {
-        timestamps: true,
-    }
+    timestamps: true,
+}
 )
 
 // Buat model finance berdasarkan skema

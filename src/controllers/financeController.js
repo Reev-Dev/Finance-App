@@ -14,11 +14,19 @@ const getFinances = async (req, res) => {
 
 // Controller untuk membuat data finance baru
 const createFinance = async (req, res) => {
-    const { title, amount, type } = req.body;
+    const { title, amount, type, category } = req.body;
 
     // Validasi input
-    if (!title || !amount || !type) {
+    if (!title || !amount || !type || !category) {
         return res.status(400).json({ message: 'Semua field harus diisi' });
+    }
+
+    if (!['income', 'expense'].includes(type)) {
+        return res.status(400).json({ message: 'Tipe harus income atau expense' });
+    }
+
+    if (!['salary', 'education', 'health', 'food', 'transportation', 'entertainment', 'utilities', 'others'].includes(category)) {
+        return res.status(400).json({ message: 'Kategori harus salary, food, transportation, entertainment, utilities, others' });
     }
 
     try {
@@ -27,7 +35,8 @@ const createFinance = async (req, res) => {
             user: req.user.id,
             title,
             amount,
-            type
+            type,
+            category
         });
 
         res.status(201).json(finance);
@@ -61,6 +70,30 @@ const updateFinance = async (req, res) => {
         return res.status(500).json({ message: 'Gagal mengupdate data finance' });
     }
 }
+
+// Fungsi untuk mendapatkan statistik berdasarkan kategori
+const getCategoryStats = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Ambil semua data keuangan user
+        const finances = await Finance.find({ user: userId });
+
+        // Kelompokkan data berdasarkan kategori
+        const categoryStats = finances.reduce((acc, curr) => {
+            if (!acc[curr.category]) {
+                acc[curr.category] = { total: 0, count: 0 };
+            }
+            acc[curr.category].total += curr.amount;
+            acc[curr.category].count += 1;
+            return acc;
+        }, {});
+
+        res.status(200).json(categoryStats);
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal mendapatkan statistik kategori' });
+    }
+};
 
 // Controller untuk mendapatkan laporan finance user
 const getFinanceReport = async (req, res) => {
@@ -155,4 +188,4 @@ const deleteFinance = async (req, res) => {
     }
 };
 
-module.exports = { getFinances, createFinance, updateFinance, getFinanceReport, filterFinance, deleteFinance };
+module.exports = { getFinances, createFinance, updateFinance, getCategoryStats, getFinanceReport, filterFinance, deleteFinance };

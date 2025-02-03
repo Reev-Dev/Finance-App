@@ -6,19 +6,14 @@ const {
     getFinances,
     createFinance,
     updateFinance,
+    getCategoryStats,
     getFinanceReport,
     filterFinance,
     deleteFinance,
 } = require('../controllers/financeController');
 
-// Route untuk mendapatkan semua data finance
-router.get('/', protect, getFinances);
-
-// Route untuk membuat data finance baru
-router.post('/', protect, createFinance);
-
-// Route untuk mengupdate data finance
-router.put('/:id', protect, updateFinance);
+router.route('/').get(protect, getFinances).post(protect, createFinance);
+router.route('/:id').put(protect, updateFinance).delete(protect, deleteFinance);
 
 // Route untuk mendapatkan laporan finance
 router.get('/report', protect, getFinanceReport);
@@ -26,7 +21,7 @@ router.get('/report', protect, getFinanceReport);
 // Route untuk mendapatkan data finance berdasarkan tahun
 router.get('/filter', protect, filterFinance);
 
-// Route untuk menghapus data finance   
-router.delete('/:id', protect, deleteFinance);
+// Route untuk mendapatkan statistik berdasarkan kategori
+router.get('/category-stats', protect, getCategoryStats);
 
 module.exports = router;
