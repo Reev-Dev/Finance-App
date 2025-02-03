@@ -7,7 +7,7 @@ const {
     createFinance,
     updateFinance,
     getFinanceReport,
-    getFinanceByYear,
+    filterFinance,
     deleteFinance,
 } = require('../controllers/financeController');
 
@@ -24,7 +24,7 @@ router.put('/:id', protect, updateFinance);
 router.get('/report', protect, getFinanceReport);
 
 // Route untuk mendapatkan data finance berdasarkan tahun
-router.get('/year/:year', protect, getFinanceByYear);
+router.get('/filter', protect, filterFinance);
 
 // Route untuk menghapus data finance   
 router.delete('/:id', protect, deleteFinance);

@@ -92,13 +92,45 @@ const getFinanceReport = async (req, res) => {
 };
 
 // Controller untuk mendapatkan data berdasarkan tahun
-const getFinanceByYear = async (req, res) => {
-    const { year } = req.params;
+const filterFinance = async (req, res) => {
     try {
-        const finances = await Finance.find({ user: req.user.id, createdAt: { $gte: new Date(`${year}-01-01`), $lte: new Date(`${year}-12-31`) } });
+        const userId = req.user._id; // Ambil ID user dari JWT
+        const { type, month, year } = req.query; // Ambil query parameters
+
+        let query = { user: userId };
+
+        if (type) {
+            query.type = type; // ex: 'income' atau 'expense'
+        }
+
+        // Filter berdasarkan tahun
+        if (year) {
+            const startOfYear = new Date(`${year}-01-01T00:00:00.000Z`);
+            const endOfYear = new Date(`${Number(year) + 1}-01-01T00:00:00.000Z`);
+            query.createdAt = { $gte: startOfYear, $lt: endOfYear };
+        }
+
+        // Filter berdasarkan bulan (jika bulan ada)
+        if (month) {
+            if (!query.createdAt) {
+                query.createdAt = {};
+            }
+            const yearValue = year || new Date().getFullYear(); // Gunakan tahun saat ini jika tidak diberikan
+            const monthStart = new Date(`${yearValue}-${String(month).padStart(2, '0')}-01T00:00:00.000Z`);
+            const nextMonth = Number(month) + 1;
+            const monthEnd = nextMonth > 12
+                ? new Date(`${Number(yearValue) + 1}-01-01T00:00:00.000Z`)
+                : new Date(`${yearValue}-${String(nextMonth).padStart(2, '0')}-01T00:00:00.000Z`);
+            query.createdAt.$gte = monthStart;
+            query.createdAt.$lt = monthEnd;
+        }
+
+        // Ambil data berdasarkan query yang telah dibuat
+        const finances = await Finance.find(query).sort({ createdAt: -1 });
+
         res.status(200).json(finances);
-    } catch (err) {
-        res.status(500).json({ message: 'Server trouble' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -123,4 +155,4 @@ const deleteFinance = async (req, res) => {
     }
 };
 
-module.exports = { getFinances, createFinance, updateFinance, getFinanceReport, getFinanceByYear, deleteFinance };
+module.exports = { getFinances, createFinance, updateFinance, getFinanceReport, filterFinance, deleteFinance };
