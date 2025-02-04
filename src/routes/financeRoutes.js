@@ -9,6 +9,7 @@ const {
     getCategoryStats,
     getMonthlyStats,
     getFinanceReport,
+    getFinanceReportByPeriod,
     filterFinance,
     deleteFinance,
 } = require('../controllers/financeController');
@@ -18,6 +19,9 @@ router.route('/:id').put(protect, updateFinance).delete(protect, deleteFinance);
 
 // Route untuk mendapatkan laporan finance
 router.get('/report', protect, getFinanceReport);
+
+// Route untuk mendapatkan laporan finance berdasarkan periode tertentu
+router.get('/report-by-period', protect, getFinanceReportByPeriod);
 
 // Route untuk mendapatkan data finance berdasarkan tahun
 router.get('/filter', protect, filterFinance);

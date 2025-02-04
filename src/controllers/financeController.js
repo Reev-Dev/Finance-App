@@ -168,6 +168,59 @@ const getFinanceReport = async (req, res) => {
     }
 };
 
+// Controller untuk mendapatkan laporan keuangan berdasarkan periode tertentu
+const getFinanceReportByPeriod = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { startDate, endDate } = req.query;
+
+        // Validasi input
+        if (!startDate || !endDate) {
+            return res.status(400).json({ message: 'Semua field harus diisi' });
+        }
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return res.status(400).json({ message: 'Tanggal tidak valid' });
+        }
+
+        if (start > end) {
+            return res.status(400).json({ message: 'Tanggal awal harus lebih kecil dari tanggal akhir' });
+        }
+
+        const finances = await Finance.find({
+            user: userId,
+            createdAt: { $gte: start, $lt: end },
+        });
+
+        // filter dan hitung total incomes
+        const totalIncomes = finances
+            .filter(finance => finance.type === 'income')
+            .reduce((total, finance) => total + finance.amount, 0);
+
+        // filter dan hitung total expenses
+        const totalExpenses = finances
+            .filter(finance => finance.type === 'expense')
+            .reduce((total, finance) => total + finance.amount, 0);
+
+        // hitung balance
+        const balance = totalIncomes - totalExpenses;
+
+        // kirimkan laporan sebagai response
+        res.status(200).json({
+            startDate,
+            endDate,
+            totalIncomes,
+            totalExpenses,
+            balance
+        });
+    } catch (err) {
+       res.status(500).json({ message: 'Server trouble' });
+    }
+}
+
 // Controller untuk mendapatkan data berdasarkan tahun
 const filterFinance = async (req, res) => {
     try {
@@ -271,4 +324,4 @@ const deleteFinance = async (req, res) => {
     }
 };
 
-module.exports = { getFinances, createFinance, updateFinance, getCategoryStats, getMonthlyStats, getFinanceReport, filterFinance, deleteFinance };
+module.exports = { getFinances, createFinance, updateFinance, getCategoryStats, getMonthlyStats, getFinanceReport, getFinanceReportByPeriod, filterFinance, deleteFinance };
